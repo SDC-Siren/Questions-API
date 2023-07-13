@@ -1,6 +1,16 @@
+const model = require('../models');
+
 module.exports.getQuestions = async (req, res) => {
   try {
-    res.send('QUESTIONS!');
+    if (!req.query.product_id) {
+      res.sendStatus(404);
+      return;
+    }
+    let product_id = req.query.product_id;
+    let page = req.query.page || 1;
+    let count = req.query.count || 5;
+    let result = await model.getQuestions(product_id, page, count);
+    res.send(result);
   } catch (err) {
     console.log(err);
   }
@@ -8,7 +18,8 @@ module.exports.getQuestions = async (req, res) => {
 
 module.exports.getAnswers = async (req, res) => {
   try {
-    res.send(`ANSWERS FOR ID: ${req.params.question_id}!`);
+    let result = await model.getAnswers(req.params.question_id);
+    res.send(result);
   } catch (err) {
     console.log(err);
   }
@@ -16,7 +27,8 @@ module.exports.getAnswers = async (req, res) => {
 
 module.exports.postQuestion = async (req, res) => {
   try {
-    res.send('POST QUESTION!');
+    await model.postQuestion();
+    res.status(201).send();
   } catch (err) {
     console.log(err);
   }
@@ -24,7 +36,8 @@ module.exports.postQuestion = async (req, res) => {
 
 module.exports.postAnswer = async (req, res) => {
   try {
-    res.send(`POST ANSWER FOR ID: ${req.params.question_id}!`);
+    await model.postAnswer(req.params.question_id);
+    res.status(201).send();
   } catch (err) {
     console.log(err);
   }
@@ -32,7 +45,8 @@ module.exports.postAnswer = async (req, res) => {
 
 module.exports.helpfulQuestion = async (req, res) => {
   try {
-    res.send(`QUESTION ID: ${req.params.question_id} HELPFUL!`);
+    await model.helpfulQuestion();
+    res.status(204).send();
   } catch (err) {
     console.log(err);
   }
@@ -40,7 +54,8 @@ module.exports.helpfulQuestion = async (req, res) => {
 
 module.exports.reportQuestion = async (req, res) => {
   try {
-    res.send(`QUESTION ID: ${req.params.question_id} REPORTED!`);
+    await model.reportQuestion();
+    res.status(204).send();
   } catch (err) {
     console.log(err);
   }
@@ -48,7 +63,8 @@ module.exports.reportQuestion = async (req, res) => {
 
 module.exports.helpfulAnswer = async (req, res) => {
   try {
-    res.send(`ANSWER ID: ${req.params.answer_id} HELPFUL!`);
+    await model.helpfulAnswer();
+    res.status(204).send();
   } catch (err) {
     console.log(err);
   }
@@ -56,7 +72,8 @@ module.exports.helpfulAnswer = async (req, res) => {
 
 module.exports.reportAnswer = async (req, res) => {
   try {
-    res.send(`ANSWER ID: ${req.params.answer_id} REPORTED!`);
+    await model.reportAnswer();
+    res.status(204).send();
   } catch (err) {
     console.log(err);
   }
