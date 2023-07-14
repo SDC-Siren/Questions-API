@@ -1,6 +1,14 @@
-module.exports.getQuestions = async () => {
+const db = require('../db');
+
+module.exports.getQuestions = async (product_id, page, count) => {
   try {
-    return 'Questions!';
+    const offset = (page - 1) * count;
+    let result = await db.query(`SELECT * FROM questions WHERE (reported = 'f' AND product_id = '${product_id}') LIMIT ${count} OFFSET ${offset}`);
+    let response = {
+      "product_id": product_id,
+      "results": result.rows
+    }
+    return response;
   } catch (err) {
     console.log(err);
   }
