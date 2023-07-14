@@ -1,10 +1,11 @@
 const express = require('express');
 const morgan = require('morgan');
 const cors = require('cors');
+require('dotenv').config();
 const routes = require('./routes.js');
 
 const app = express();
-const port = 3000;
+const port = process.env.SERVER_PORT;
 
 app.use(express.json());
 app.use(cors());

@@ -18,7 +18,10 @@ module.exports.getQuestions = async (req, res) => {
 
 module.exports.getAnswers = async (req, res) => {
   try {
-    let result = await model.getAnswers(req.params.question_id);
+    let question_id = req.params.question_id;
+    let page = req.query.page || 1;
+    let count = req.query.count || 5;
+    let result = await model.getAnswers(question_id, page, count);
     res.send(result);
   } catch (err) {
     console.log(err);

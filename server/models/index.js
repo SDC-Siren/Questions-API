@@ -14,9 +14,17 @@ module.exports.getQuestions = async (product_id, page, count) => {
   }
 };
 
-module.exports.getAnswers = async (question_id) => {
+module.exports.getAnswers = async (question_id, page, count) => {
   try {
-    return `Answers for question: ${question_id}!`;
+    const offset = (page - 1) * count;
+    let result = await db.query(`SELECT * FROM answers WHERE (reported = 'f' AND question_id = '${question_id}') LIMIT ${count} OFFSET ${offset}`);
+    let response = {
+      "question": question_id,
+      "page": page,
+      "count": count,
+      "results": result.rows
+    }
+    return response;
   } catch (err) {
     console.log(err);
   }
