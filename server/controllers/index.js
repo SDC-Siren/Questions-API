@@ -30,7 +30,8 @@ module.exports.getAnswers = async (req, res) => {
 
 module.exports.postQuestion = async (req, res) => {
   try {
-    await model.postQuestion();
+    req.body.date = Date.now();
+    await model.postQuestion(req.body);
     res.status(201).send();
   } catch (err) {
     console.log(err);

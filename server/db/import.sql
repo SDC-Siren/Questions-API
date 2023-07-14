@@ -16,3 +16,9 @@
 --
 -- uncomment 1 section at a time and run with psql -U patrickdaly -d sdc_qna <server/db/import.sql
 --
+
+
+-- for primary key sequence issue:
+-- SELECT setval('questions_question_id_seq'::regclass, (SELECT MAX(question_id) FROM questions)+1);
+-- SELECT setval('answers_answer_id_seq'::regclass, (SELECT MAX(answer_id) FROM answers)+1);
+-- SELECT setval('photos_photo_id_seq'::regclass, (SELECT MAX(photo_id) FROM photos)+1);

@@ -59,9 +59,12 @@ module.exports.getAnswers = async (question_id, page, count) => {
   }
 };
 
-module.exports.postQuestion = async () => {
+module.exports.postQuestion = async (question) => {
   try {
-    return 'Question Added!';
+    await db.query(
+      `INSERT INTO questions (product_id, question_body, question_date, asker_name, asker_email, question_helpfulness)
+        VALUES (${question.product_id}, '${question.body}', ${question.date}, '${question.name}', '${question.email}', 0)`
+    )
   } catch (err) {
     console.log(err);
   }
