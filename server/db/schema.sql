@@ -2,7 +2,7 @@
 DROP TABLE IF EXISTS questions CASCADE;
 
 CREATE TABLE questions (
-  id SERIAL NOT NULL PRIMARY KEY,
+  question_id SERIAL NOT NULL PRIMARY KEY,
   product_id INTEGER NOT NULL,
   question_body VARCHAR NOT NULL,
   question_date BIGINT NOT NULL,
@@ -16,8 +16,8 @@ CREATE TABLE questions (
 DROP TABLE IF EXISTS answers CASCADE;
 
 CREATE TABLE answers (
-  id SERIAL NOT NULL PRIMARY KEY,
-  question_id INTEGER NOT NULL REFERENCES questions (id),
+  answer_id SERIAL NOT NULL PRIMARY KEY,
+  question_id INTEGER NOT NULL REFERENCES questions (question_id),
   answer_body VARCHAR NOT NULL,
   answer_date BIGINT NOT NULL,
   answerer_name VARCHAR NOT NULL,
@@ -30,7 +30,9 @@ CREATE TABLE answers (
 DROP TABLE IF EXISTS photos CASCADE;
 
 CREATE TABLE photos (
-  id SERIAL NOT NULL PRIMARY KEY,
-  answer_id INTEGER NOT NULL REFERENCES answers (id),
+  photo_id SERIAL NOT NULL PRIMARY KEY,
+  answer_id INTEGER NOT NULL REFERENCES answers (answer_id),
   url VARCHAR NOT NULL
 );
+
+-- run with psql -U patrickdaly -d sdc_qna <server/db/schema.sql
