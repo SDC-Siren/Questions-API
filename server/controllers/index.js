@@ -13,6 +13,7 @@ module.exports.getQuestions = async (req, res) => {
     res.send(result);
   } catch (err) {
     console.log(err);
+    res.status(500).send();
   }
 };
 
@@ -25,6 +26,7 @@ module.exports.getAnswers = async (req, res) => {
     res.send(result);
   } catch (err) {
     console.log(err);
+    res.status(500).send();
   }
 };
 
@@ -35,15 +37,18 @@ module.exports.postQuestion = async (req, res) => {
     res.status(201).send();
   } catch (err) {
     console.log(err);
+    res.status(500).send();
   }
 };
 
 module.exports.postAnswer = async (req, res) => {
   try {
-    await model.postAnswer(req.params.question_id);
+    req.body.date = Date.now();
+    await model.postAnswer(req.params.question_id, req.body);
     res.status(201).send();
   } catch (err) {
     console.log(err);
+    res.status(500).send();
   }
 };
 
@@ -53,6 +58,7 @@ module.exports.helpfulQuestion = async (req, res) => {
     res.status(204).send();
   } catch (err) {
     console.log(err);
+    res.status(500).send();
   }
 };
 
@@ -62,6 +68,7 @@ module.exports.reportQuestion = async (req, res) => {
     res.status(204).send();
   } catch (err) {
     console.log(err);
+    res.status(500).send();
   }
 };
 
@@ -71,6 +78,7 @@ module.exports.helpfulAnswer = async (req, res) => {
     res.status(204).send();
   } catch (err) {
     console.log(err);
+    res.status(500).send();
   }
 };
 
@@ -80,5 +88,6 @@ module.exports.reportAnswer = async (req, res) => {
     res.status(204).send();
   } catch (err) {
     console.log(err);
+    res.status(500).send();
   }
 };
