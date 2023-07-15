@@ -38,5 +38,9 @@ CREATE TABLE photos (
   PRIMARY KEY (photo_id)
 );
 
+CREATE INDEX idx_product_id ON questions (product_id);
+CREATE INDEX idx_question_id ON answers (question_id);
+CREATE INDEX idx_answer_id ON photos (answer_id);
+
 -- run with:
 -- psql -U patrickdaly -d sdc_qna <server/db/schema.sql
