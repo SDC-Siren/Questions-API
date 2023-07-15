@@ -13,12 +13,12 @@ module.exports.getQuestions = async (product_id, page, count) => {
         `SELECT answer_id AS id, answer_body AS body, answer_date AS date, answerer_name, answer_helpfulness AS helpfulness FROM answers
         WHERE (reported = 'f' AND question_id = '${question.question_id}')
         LIMIT 10`
-      )
+      );
       question.answers = {};
       await Promise.all(answers.rows.map(async (answer) => {
         let photos = await db.query(
           `SELECT url FROM photos WHERE answer_id = '${answer.id}'`
-        )
+        );
         answer.photos = photos.rows;
         question.answers[answer.id] = answer;
       }));
@@ -26,7 +26,7 @@ module.exports.getQuestions = async (product_id, page, count) => {
     let response = {
       "product_id": product_id,
       "results": result.rows
-    }
+    };
     return response;
   } catch (err) {
     throw new Error(err);
@@ -52,7 +52,7 @@ module.exports.getAnswers = async (question_id, page, count) => {
       "page": page,
       "count": count,
       "results": answers.rows
-    }
+    };
     return response;
   } catch (err) {
     throw new Error(err);
@@ -64,7 +64,7 @@ module.exports.postQuestion = async (question) => {
     await db.query(
       `INSERT INTO questions (product_id, question_body, question_date, asker_name, asker_email)
         VALUES (${question.product_id}, '${question.body}', ${question.date}, '${question.name}', '${question.email}')`
-    )
+    );
   } catch (err) {
     throw new Error(err);
   }
@@ -91,33 +91,49 @@ module.exports.postAnswer = async (question_id, answer) => {
   }
 };
 
-module.exports.helpfulQuestion = async () => {
+module.exports.helpfulQuestion = async (question_id) => {
   try {
-    return 'Question marked Helpful';
+    await db.query(
+      `UPDATE questions
+        SET question_helpfulness = question_helpfulness + 1
+        WHERE question_id = '${question_id}'`
+    );
   } catch (err) {
     throw new Error(err);
   }
 };
 
-module.exports.reportQuestion = async () => {
+module.exports.reportQuestion = async (question_id) => {
   try {
-    return 'Question Reported';
+    await db.query(
+      `UPDATE questions
+        SET reported = true
+        WHERE question_id = '${question_id}'`
+    );
   } catch (err) {
     throw new Error(err);
   }
 };
 
-module.exports.helpfulAnswer = async () => {
+module.exports.helpfulAnswer = async (answer_id) => {
   try {
-    return 'Answer marked Helpful';
+    await db.query(
+      `UPDATE answers
+        SET answer_helpfulness = answer_helpfulness + 1
+        WHERE answer_id = '${answer_id}'`
+    );
   } catch (err) {
     throw new Error(err);
   }
 };
 
-module.exports.reportAnswer = async () => {
+module.exports.reportAnswer = async (answer_id) => {
   try {
-    return 'Answer Reported';
+    await db.query(
+      `UPDATE answers
+        SET reported = true
+        WHERE answer_id = '${answer_id}'`
+    );
   } catch (err) {
     throw new Error(err);
   }

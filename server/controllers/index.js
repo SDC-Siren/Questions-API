@@ -54,7 +54,7 @@ module.exports.postAnswer = async (req, res) => {
 
 module.exports.helpfulQuestion = async (req, res) => {
   try {
-    await model.helpfulQuestion();
+    await model.helpfulQuestion(req.params.question_id);
     res.status(204).send();
   } catch (err) {
     console.log(err);
@@ -64,7 +64,7 @@ module.exports.helpfulQuestion = async (req, res) => {
 
 module.exports.reportQuestion = async (req, res) => {
   try {
-    await model.reportQuestion();
+    await model.reportQuestion(req.params.question_id);
     res.status(204).send();
   } catch (err) {
     console.log(err);
@@ -74,7 +74,7 @@ module.exports.reportQuestion = async (req, res) => {
 
 module.exports.helpfulAnswer = async (req, res) => {
   try {
-    await model.helpfulAnswer();
+    await model.helpfulAnswer(req.params.answer_id);
     res.status(204).send();
   } catch (err) {
     console.log(err);
@@ -84,7 +84,7 @@ module.exports.helpfulAnswer = async (req, res) => {
 
 module.exports.reportAnswer = async (req, res) => {
   try {
-    await model.reportAnswer();
+    await model.reportAnswer(req.params.answer_id);
     res.status(204).send();
   } catch (err) {
     console.log(err);
