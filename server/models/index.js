@@ -9,6 +9,7 @@ module.exports.getQuestions = async (product_id, page, count) => {
         LIMIT ${count} OFFSET ${offset}`
     );
     await Promise.all(result.rows.map(async (question) => {
+      question.question_date = new Date(Number(question.question_date));
       let answers = await db.query(
         `SELECT answer_id AS id, answer_body AS body, answer_date AS date, answerer_name, answer_helpfulness AS helpfulness FROM answers
         WHERE (reported = 'f' AND question_id = '${question.question_id}')
@@ -16,10 +17,13 @@ module.exports.getQuestions = async (product_id, page, count) => {
       );
       question.answers = {};
       await Promise.all(answers.rows.map(async (answer) => {
+        answer.date = new Date(Number(answer.date));
         let photos = await db.query(
-          `SELECT url FROM photos WHERE answer_id = '${answer.id}'`
+          `SELECT ARRAY(
+            SELECT url FROM photos WHERE answer_id = '${answer.id}'
+          )`
         );
-        answer.photos = photos.rows;
+        answer.photos = photos.rows[0].array;
         question.answers[answer.id] = answer;
       }));
     }));
@@ -42,6 +46,7 @@ module.exports.getAnswers = async (question_id, page, count) => {
         LIMIT ${count} OFFSET ${offset}`
       );
       await Promise.all(answers.rows.map(async (answer) => {
+        answer.date = new Date(Number(answer.date));
         let photos = await db.query(
           `SELECT photo_id AS id, url FROM photos WHERE answer_id = '${answer.answer_id}'`
         )
