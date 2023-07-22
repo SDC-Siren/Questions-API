@@ -4,33 +4,60 @@ module.exports.getQuestions = async (product_id, page, count) => {
   try {
     const offset = (page - 1) * count;
     let result = await db.query(
-      `SELECT question_id, question_body, question_date, asker_name, question_helpfulness, reported FROM questions
-        WHERE (reported = 'f' AND product_id = '${product_id}')
-        LIMIT ${count} OFFSET ${offset}`
-    );
-    await Promise.all(result.rows.map(async (question) => {
-      question.question_date = new Date(Number(question.question_date));
-      let answers = await db.query(
-        `SELECT answer_id AS id, answer_body AS body, answer_date AS date, answerer_name, answer_helpfulness AS helpfulness FROM answers
-        WHERE (reported = 'f' AND question_id = '${question.question_id}')
-        LIMIT 10`
-      );
-      question.answers = {};
-      await Promise.all(answers.rows.map(async (answer) => {
-        answer.date = new Date(Number(answer.date));
-        let photos = await db.query(
-          `SELECT ARRAY(
-            SELECT url FROM photos WHERE answer_id = '${answer.id}'
-          )`
-        );
-        answer.photos = photos.rows[0].array;
-        question.answers[answer.id] = answer;
-      }));
-    }));
-    let response = {
-      "product_id": product_id,
-      "results": result.rows
-    };
+      `SELECT product_id, (SELECT jsonb_agg(
+        jsonb_build_object(
+          'question_id', question_id,
+          'question_body', question_body,
+          'question_date', question_date,
+          'asker_name', asker_name,
+          'question_helpfulness', question_helpfulness,
+          'reported', reported,
+          'answers', (SELECT COALESCE (jsonb_object_agg(
+            answer_id, jsonb_build_object(
+              'id', answer_id,
+              'body', answer_body,
+              'date', answer_date,
+              'answerer_name', answerer_name,
+              'helpfulness', answer_helpfulness,
+              'photos', (SELECT COALESCE (jsonb_agg(url), '[]') FROM photos WHERE answer_id = answers.answer_id)
+            )
+          ), '{}') FROM answers WHERE (reported = 'f' AND question_id = questions.question_id) LIMIT 10)
+        )
+       )) AS results
+       FROM questions
+       WHERE (reported = 'f' AND product_id = '${product_id}')
+       GROUP BY product_id
+       LIMIT ${count} OFFSET ${offset}`
+    )
+    return result.rows[0];
+    // let result = await db.query(
+    //   `SELECT question_id, question_body, question_date, asker_name, question_helpfulness, reported FROM questions
+    //     WHERE (reported = 'f' AND product_id = '${product_id}')
+    //     LIMIT ${count} OFFSET ${offset}`
+    // );
+    // await Promise.all(result.rows.map(async (question) => {
+    //   // question.question_date = new Date(Number(question.question_date));
+    //   let answers = await db.query(
+    //     `SELECT answer_id AS id, answer_body AS body, answer_date AS date, answerer_name, answer_helpfulness AS helpfulness FROM answers
+    //     WHERE (reported = 'f' AND question_id = '${question.question_id}')
+    //     LIMIT 10`
+    //   );
+    //   question.answers = {};
+    //   await Promise.all(answers.rows.map(async (answer) => {
+    //     // answer.date = new Date(Number(answer.date));
+    //     let photos = await db.query(
+    //       `SELECT ARRAY(
+    //         SELECT url FROM photos WHERE answer_id = '${answer.id}'
+    //       )`
+    //     );
+    //     answer.photos = photos.rows[0].array;
+    //     question.answers[answer.id] = answer;
+    //   }));
+    // }));
+    // let response = {
+    //   "product_id": product_id,
+    //   "results": result.rows
+    // };
     return response;
   } catch (err) {
     throw new Error(err);
@@ -46,7 +73,7 @@ module.exports.getAnswers = async (question_id, page, count) => {
         LIMIT ${count} OFFSET ${offset}`
       );
       await Promise.all(answers.rows.map(async (answer) => {
-        answer.date = new Date(Number(answer.date));
+        // answer.date = new Date(Number(answer.date));
         let photos = await db.query(
           `SELECT photo_id AS id, url FROM photos WHERE answer_id = '${answer.answer_id}'`
         )
